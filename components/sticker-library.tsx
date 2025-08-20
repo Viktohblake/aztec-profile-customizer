@@ -1,0 +1,48 @@
+"use client"
+
+import type React from "react"
+
+interface StickerLibraryProps {
+  onStickerSelect: (stickerSrc: string) => void
+}
+
+const stickers = [
+  "/feather-hat.png",
+  "/cup-right.png",
+  "/cup-left.png"
+]
+
+export function StickerLibrary({ onStickerSelect }: StickerLibraryProps) {
+  const handleDragStart = (e: React.DragEvent, sticker: string) => {
+    e.dataTransfer.setData("text/plain", sticker)
+    e.dataTransfer.effectAllowed = "copy"
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+        {stickers.map((sticker, index) => (
+          <div
+            key={index}
+            draggable
+            onDragStart={(e) => handleDragStart(e, sticker)}
+            onClick={() => onStickerSelect(sticker)}
+            className="
+              aspect-square p-3 rounded-lg border border-border
+              hover:border-primary hover:bg-primary/5
+              transition-colors flex items-center justify-center
+              text-2xl bg-card cursor-grab active:cursor-grabbing
+            "
+          >
+            <img
+              src={sticker || "/placeholder.svg"}
+              alt={`Sticker ${index + 1}`}
+              className="w-full h-full object-contain pointer-events-none"
+              crossOrigin="anonymous"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
