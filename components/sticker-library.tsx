@@ -8,8 +8,14 @@ interface StickerLibraryProps {
 
 const stickers = [
   "/feather-hat.png",
+  "/hat1.png",
+  "/hat2.png",
   "/cup-right.png",
-  "/cup-left.png"
+  "/cup-left.png",
+  "/eyeglass.png",
+  "/facemask.png",
+  "/facemask2.png",
+  "/goose-chain.png"
 ]
 
 export function StickerLibrary({ onStickerSelect }: StickerLibraryProps) {

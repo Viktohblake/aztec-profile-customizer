@@ -81,12 +81,12 @@ export default function ProfileCustomizer() {
     <div className="min-h-screen">
       <div className="container mx-auto px-2 sm:px-4 py-8">
         <div className="text-center mb-12 max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold text-foreground mb-4 drop-shadow-sm">Aztec Avatar Generator</h1>
+          <h1 className="text-5xl font-bold text-foreground mb-4 drop-shadow-sm">Aztec Profile Customizer</h1>
           <p className="text-xl text-muted-foreground mb-6 drop-shadow-sm">
             Want to rep the Aztec privacy movement on your socials? You are in the right place.
           </p>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-8 border border-white/20">
+          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-6 mb-8 border border-white/20">
             <p className="text-lg text-foreground mb-4 leading-relaxed">
               This page gives you everything you need to update your profile and claim your place in the community. Tell
               the world you stand with privacy and helping build it with Aztec Network.
@@ -99,19 +99,19 @@ export default function ProfileCustomizer() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-              <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">1</div>
                 <p className="text-sm text-foreground font-medium">Upload your existing profile photo</p>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">2</div>
                 <p className="text-sm text-foreground font-medium">Select and drop the stickers</p>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">3</div>
                 <p className="text-sm text-foreground font-medium">Click download</p>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+              <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">4</div>
                 <p className="text-sm text-foreground font-medium">Instantly receive your customized Aztec PFP</p>
               </div>
