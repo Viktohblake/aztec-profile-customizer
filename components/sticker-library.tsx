@@ -7,14 +7,18 @@ interface StickerLibraryProps {
 }
 
 const stickers = [
+  "/aztec-chain.png",
   "/feather-hat.png",
   "/hat1.png",
   "/hat2.png",
+  "/lasar-goose-right.png",
   "/cup-right.png",
   "/cup-left.png",
   "/eyeglass.png",
   "/facemask.png",
   "/facemask2.png",
+  "/lasar-goose-left.png",
+  "/goose-glass.png",
   "/goose-chain.png"
 ]
 

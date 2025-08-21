@@ -81,7 +81,15 @@ export default function ProfileCustomizer() {
     <div className="min-h-screen">
       <div className="container mx-auto px-2 sm:px-4 py-8">
         <div className="text-center mb-12 max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold text-foreground mb-4 drop-shadow-sm">Aztec Profile Customizer</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 flex flex-col sm:flex-row items-center justify-center">
+            <img 
+    src="/logo.png" 
+    alt="Aztec Logo" 
+    className="w-15 h-10 object-contain mb-5"
+  /> 
+          <p className="text-5xl font-bold text-foreground mb-4 drop-shadow-sm">Aztec Profile Customizer</p>
+
+          </h1>
           <p className="text-xl text-muted-foreground mb-6 drop-shadow-sm">
             Want to rep the Aztec privacy movement on your socials? You are in the right place.
           </p>
@@ -93,8 +101,8 @@ export default function ProfileCustomizer() {
             </p>
             <p className="text-base text-muted-foreground mb-6 leading-relaxed">
               Follow the steps below to customize your profile and show the world you are part of the Aztec community.
-              Using the Aztec avatar generator to give your profile picture a custom Aztec Network twist, featuring
-              goose ears, hats, glasses and other fun designs. It's a playful way to show you are part of something
+              Using the Aztec avatar generator to give your profile picture a custom Aztec Network twist, featuring hats, glasses,
+              chains, masks and juice cup, more stickers will be added soon. It's a playful way to show you are part of something
               bigger.
             </p>
 
@@ -105,7 +113,7 @@ export default function ProfileCustomizer() {
               </div>
               <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">2</div>
-                <p className="text-sm text-foreground font-medium">Select and drop the stickers</p>
+                <p className="text-sm text-foreground font-medium">Select the stickers and adjust to your taste</p>
               </div>
               <div className="bg-white/30 rounded-lg p-4 border border-white/50">
                 <div className="text-2xl font-bold text-primary mb-2">3</div>
@@ -121,7 +129,7 @@ export default function ProfileCustomizer() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 max-w-none mx-auto">
             {/* Center Panel - Photo Canvas */}
             <div className="lg:col-span-7 order-1 lg:order-1">
-              <Card className="p-4 sm:p-6 bg-white/20 backdrop-blur-md border-white/30 shadow-xl">
+              <Card className="p-4 sm:p-6 bg-white/30 backdrop-blur-md border-white/30 shadow-xl">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                   <div className="flex items-center gap-4">
                     <Button
@@ -170,7 +178,7 @@ export default function ProfileCustomizer() {
 
             {/* Right Panel - Sticker Library */}
             <div className="lg:col-span-5 order-2 lg:order-2">
-              <Card className="p-4 sm:p-6 bg-white/20 backdrop-blur-md border-white/30 shadow-xl">
+              <Card className="p-4 sm:p-6 bg-white/30 backdrop-blur-md border-white/30 shadow-xl">
                 <h2 className="text-xl font-semibold mb-4 text-foreground">Aztec Stickers</h2>
                 <StickerLibrary onStickerSelect={handleStickerAdd} />
               </Card>
