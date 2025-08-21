@@ -184,6 +184,9 @@ export default function ProfileCustomizer() {
               </Card>
             </div>
           </div>
+          <div className="text-center mt-8">
+            <p className="text-sm text-muted-foreground/80">Made with ❤️ by @viktohblake</p>
+          </div>
         </div>
       </div>
     </div>
