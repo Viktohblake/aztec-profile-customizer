@@ -134,8 +134,32 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
       e.dataTransfer.dropEffect = "copy"
     }, [])
 
-    const handleMouseDown = useCallback(
-      (e: React.MouseEvent) => {
+      const getEventCoordinates = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (!rect) return { x: 0, y: 0 }
+
+      let clientX: number, clientY: number
+
+      if ("touches" in e && e.touches.length > 0) {
+        clientX = e.touches[0].clientX
+        clientY = e.touches[0].clientY
+      } else if ("changedTouches" in e && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX
+        clientY = e.changedTouches[0].clientY
+      } else {
+        clientX = (e as React.MouseEvent).clientX
+        clientY = (e as React.MouseEvent).clientY
+      }
+
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+      }
+    }, [])
+
+    const handlePointerDown = useCallback(
+      (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault()
         const target = e.target as HTMLElement
 
         // Check if clicking on a resize handle
@@ -149,11 +173,7 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           }
         }
 
-        const rect = containerRef.current?.getBoundingClientRect()
-        if (!rect) return
-
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
+        const { x, y } = getEventCoordinates(e)
 
         // Check if clicking on a sticker
         const clickedSticker = stickers
@@ -172,16 +192,13 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           setSelectedSticker(null)
         }
       },
-      [stickers],
+      [stickers, getEventCoordinates],
     )
 
-    const handleMouseMove = useCallback(
-      (e: React.MouseEvent) => {
-        const rect = containerRef.current?.getBoundingClientRect()
-        if (!rect) return
-
-        const mouseX = e.clientX - rect.left
-        const mouseY = e.clientY - rect.top
+    const handlePointerMove = useCallback(
+      (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault()
+        const { x: mouseX, y: mouseY } = getEventCoordinates(e)
 
         if (isResizing && selectedSticker && resizeHandle) {
           const sticker = stickers.find((s) => s.id === selectedSticker)
@@ -245,10 +262,19 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           onStickerUpdate(selectedSticker, { x, y })
         }
       },
-      [isDragging, isResizing, selectedSticker, dragStart, resizeHandle, stickers, onStickerUpdate],
+      [
+        isDragging,
+        isResizing,
+        selectedSticker,
+        dragStart,
+        resizeHandle,
+        stickers,
+        onStickerUpdate,
+        getEventCoordinates,
+      ],
     )
 
-    const handleMouseUp = useCallback(() => {
+    const handlePointerUp = useCallback(() => {
       setIsDragging(false)
       setIsResizing(false)
       setResizeHandle(null)
@@ -279,11 +305,15 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
               height: "min(600px, calc(100vw - 2rem))",
               maxWidth: "100%",
               aspectRatio: "1/1",
+              touchAction: "none", // Prevent default touch behaviors
             }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onMouseDown={handlePointerDown}
+            onMouseMove={handlePointerMove}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+            onTouchStart={handlePointerDown}
+            onTouchMove={handlePointerMove}
+            onTouchEnd={handlePointerUp}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
@@ -310,73 +340,73 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
                   }}
                 />
 
-                {selectedSticker === sticker.id && (
+{selectedSticker === sticker.id && (
                   <>
                     {/* Corner handles */}
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-nw-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-nw-resize shadow-sm"
                       data-handle="nw"
                       style={{
-                        left: sticker.x - 6,
-                        top: sticker.y - 6,
+                        left: Math.max(0, sticker.x - 8),
+                        top: Math.max(0, sticker.y - 8),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-ne-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-ne-resize shadow-sm"
                       data-handle="ne"
                       style={{
-                        left: sticker.x + sticker.width - 6,
-                        top: sticker.y - 6,
+                        left: Math.min(592, sticker.x + sticker.width - 8),
+                        top: Math.max(0, sticker.y - 8),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-se-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-se-resize shadow-sm"
                       data-handle="se"
                       style={{
-                        left: sticker.x + sticker.width - 6,
-                        top: sticker.y + sticker.height - 6,
+                        left: Math.min(592, sticker.x + sticker.width - 8),
+                        top: Math.min(592, sticker.y + sticker.height - 8),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-sw-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-sw-resize shadow-sm"
                       data-handle="sw"
                       style={{
-                        left: sticker.x - 6,
-                        top: sticker.y + sticker.height - 6,
+                        left: Math.max(0, sticker.x - 8),
+                        top: Math.min(592, sticker.y + sticker.height - 8),
                       }}
                     />
 
                     {/* Edge handles */}
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-n-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-n-resize shadow-sm"
                       data-handle="n"
                       style={{
-                        left: sticker.x + sticker.width / 2 - 6,
-                        top: sticker.y - 6,
+                        left: Math.max(0, Math.min(592, sticker.x + sticker.width / 2 - 8)),
+                        top: Math.max(0, sticker.y - 8),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-e-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-e-resize shadow-sm"
                       data-handle="e"
                       style={{
-                        left: sticker.x + sticker.width - 6,
-                        top: sticker.y + sticker.height / 2 - 6,
+                        left: Math.min(592, sticker.x + sticker.width - 8),
+                        top: Math.max(0, Math.min(592, sticker.y + sticker.height / 2 - 8)),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-s-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-s-resize shadow-sm"
                       data-handle="s"
                       style={{
-                        left: sticker.x + sticker.width / 2 - 6,
-                        top: sticker.y + sticker.height - 6,
+                        left: Math.max(0, Math.min(592, sticker.x + sticker.width / 2 - 8)),
+                        top: Math.min(592, sticker.y + sticker.height - 8),
                       }}
                     />
                     <div
-                      className="resize-handle absolute w-3 h-3 bg-primary border border-white rounded-full cursor-w-resize"
+                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-w-resize shadow-sm"
                       data-handle="w"
                       style={{
-                        left: sticker.x - 6,
-                        top: sticker.y + sticker.height / 2 - 6,
+                        left: Math.max(0, sticker.x - 8),
+                        top: Math.max(0, Math.min(592, sticker.y + sticker.height / 2 - 8)),
                       }}
                     />
                   </>
