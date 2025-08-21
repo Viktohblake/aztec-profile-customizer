@@ -134,32 +134,8 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
       e.dataTransfer.dropEffect = "copy"
     }, [])
 
-      const getEventCoordinates = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-      const rect = containerRef.current?.getBoundingClientRect()
-      if (!rect) return { x: 0, y: 0 }
-
-      let clientX: number, clientY: number
-
-      if ("touches" in e && e.touches.length > 0) {
-        clientX = e.touches[0].clientX
-        clientY = e.touches[0].clientY
-      } else if ("changedTouches" in e && e.changedTouches.length > 0) {
-        clientX = e.changedTouches[0].clientX
-        clientY = e.changedTouches[0].clientY
-      } else {
-        clientX = (e as React.MouseEvent).clientX
-        clientY = (e as React.MouseEvent).clientY
-      }
-
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
-      }
-    }, [])
-
-    const handlePointerDown = useCallback(
-      (e: React.MouseEvent | React.TouchEvent) => {
-        e.preventDefault()
+    const handleMouseDown = useCallback(
+      (e: React.MouseEvent) => {
         const target = e.target as HTMLElement
 
         // Check if clicking on a resize handle
@@ -173,7 +149,11 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           }
         }
 
-        const { x, y } = getEventCoordinates(e)
+        const rect = containerRef.current?.getBoundingClientRect()
+        if (!rect) return
+
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
 
         // Check if clicking on a sticker
         const clickedSticker = stickers
@@ -192,13 +172,16 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           setSelectedSticker(null)
         }
       },
-      [stickers, getEventCoordinates],
+      [stickers],
     )
 
-    const handlePointerMove = useCallback(
-      (e: React.MouseEvent | React.TouchEvent) => {
-        e.preventDefault()
-        const { x: mouseX, y: mouseY } = getEventCoordinates(e)
+    const handleMouseMove = useCallback(
+      (e: React.MouseEvent) => {
+        const rect = containerRef.current?.getBoundingClientRect()
+        if (!rect) return
+
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
 
         if (isResizing && selectedSticker && resizeHandle) {
           const sticker = stickers.find((s) => s.id === selectedSticker)
@@ -262,19 +245,10 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
           onStickerUpdate(selectedSticker, { x, y })
         }
       },
-      [
-        isDragging,
-        isResizing,
-        selectedSticker,
-        dragStart,
-        resizeHandle,
-        stickers,
-        onStickerUpdate,
-        getEventCoordinates,
-      ],
+      [isDragging, isResizing, selectedSticker, dragStart, resizeHandle, stickers, onStickerUpdate],
     )
 
-    const handlePointerUp = useCallback(() => {
+    const handleMouseUp = useCallback(() => {
       setIsDragging(false)
       setIsResizing(false)
       setResizeHandle(null)
@@ -305,15 +279,11 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
               height: "min(600px, calc(100vw - 2rem))",
               maxWidth: "100%",
               aspectRatio: "1/1",
-              touchAction: "none", // Prevent default touch behaviors
             }}
-            onMouseDown={handlePointerDown}
-            onMouseMove={handlePointerMove}
-            onMouseUp={handlePointerUp}
-            onMouseLeave={handlePointerUp}
-            onTouchStart={handlePointerDown}
-            onTouchMove={handlePointerMove}
-            onTouchEnd={handlePointerUp}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
