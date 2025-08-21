@@ -30,7 +30,7 @@ export function StickerLibrary({ onStickerSelect }: StickerLibraryProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-3 flex-1 overflow-y-auto" style={{ height: "655px" }}>
+      <div className="grid grid-cols-3 gap-3 flex-1 overflow-y-auto" style={{ height: "608px" }}>
         {stickers.map((sticker, index) => (
           <div
             key={index}

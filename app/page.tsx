@@ -185,7 +185,7 @@ export default function ProfileCustomizer() {
             </div>
           </div>
           <div className="text-center mt-8">
-            <p className="text-sm text-muted-foreground/80">Made with ❤️ by @viktohblake</p>
+            <p className="text-sm backdrop-blur-lg text-muted-foreground/100">Built by the community, for the community ❤️. <a href="https://x.com/viktohblake" target="_blank" rel="noopener noreferrer" className="text-purple-950 hover:underline">@viktohblake</a></p>
           </div>
         </div>
       </div>
