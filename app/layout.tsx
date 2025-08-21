@@ -4,9 +4,19 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: "Aztec PFP Generator - Customize Your Profile",
+  description:
+    "Create custom Aztec-themed profile pictures. Upload your photo and add stickers to show your support for privacy and the Aztec Network community.",
+  icons: {
+    icon: "/aztec-pfp.png",
+    shortcut: "/aztec-pfp.png",
+    apple: "/aztec-pfp.png",
+  },
+  openGraph: {
+    title: "Aztec PFP Generator",
+    description: "Customize your profile picture with Aztec-themed stickers",
+    images: ["/og-image.png"],
+  },
 }
 
 export default function RootLayout({
