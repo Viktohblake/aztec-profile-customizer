@@ -134,7 +134,7 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
       e.dataTransfer.dropEffect = "copy"
     }, [])
 
-      const getEventCoordinates = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    const getEventCoordinates = useCallback((e: React.MouseEvent | React.TouchEvent) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return { x: 0, y: 0 }
 
@@ -151,9 +151,16 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
         clientY = (e as React.MouseEvent).clientY
       }
 
+      const containerWidth = rect.width
+      const containerHeight = rect.height
+      const canvasSize = 600
+
+      const scaleX = canvasSize / containerWidth
+      const scaleY = canvasSize / containerHeight
+
       return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
       }
     }, [])
 
@@ -162,9 +169,9 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
         e.preventDefault()
         const target = e.target as HTMLElement
 
-        // Check if clicking on a resize handle
-        if (target.classList.contains("resize-handle")) {
-          const handle = target.dataset.handle
+        if (target.classList.contains("resize-handle") || target.closest(".resize-handle")) {
+          const handleElement = target.classList.contains("resize-handle") ? target : target.closest(".resize-handle")
+          const handle = handleElement?.getAttribute("data-handle")
           if (handle) {
             setIsResizing(true)
             setResizeHandle(handle)
@@ -320,99 +327,114 @@ export const PhotoCanvas = forwardRef<HTMLCanvasElement, PhotoCanvasProps>(
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-contain" />
 
             {/* Sticker overlays for interaction */}
-            {stickers.map((sticker) => (
-              <div key={sticker.id}>
-                <div
-                  className={`
-                    absolute border-2 cursor-move
-                    ${
-                      selectedSticker === sticker.id
-                        ? "border-primary bg-primary/10"
-                        : "border-transparent hover:border-primary/50"
-                    }
-                  `}
-                  style={{
-                    left: sticker.x,
-                    top: sticker.y,
-                    width: sticker.width,
-                    height: sticker.height,
-                    transform: `rotate(${sticker.rotation}deg)`,
-                  }}
-                />
+            {stickers.map((sticker) => {
+              const containerRect = containerRef.current?.getBoundingClientRect()
+              const containerWidth = containerRect?.width || 600
+              const containerHeight = containerRect?.height || 600
+              const canvasSize = 600
 
-{selectedSticker === sticker.id && (
-                  <>
-                    {/* Corner handles */}
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-nw-resize shadow-sm"
-                      data-handle="nw"
-                      style={{
-                        left: Math.max(0, sticker.x - 8),
-                        top: Math.max(0, sticker.y - 8),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-ne-resize shadow-sm"
-                      data-handle="ne"
-                      style={{
-                        left: Math.min(592, sticker.x + sticker.width - 8),
-                        top: Math.max(0, sticker.y - 8),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-se-resize shadow-sm"
-                      data-handle="se"
-                      style={{
-                        left: Math.min(592, sticker.x + sticker.width - 8),
-                        top: Math.min(592, sticker.y + sticker.height - 8),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-sw-resize shadow-sm"
-                      data-handle="sw"
-                      style={{
-                        left: Math.max(0, sticker.x - 8),
-                        top: Math.min(592, sticker.y + sticker.height - 8),
-                      }}
-                    />
+              const scaleX = containerWidth / canvasSize
+              const scaleY = containerHeight / canvasSize
 
-                    {/* Edge handles */}
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-n-resize shadow-sm"
-                      data-handle="n"
-                      style={{
-                        left: Math.max(0, Math.min(592, sticker.x + sticker.width / 2 - 8)),
-                        top: Math.max(0, sticker.y - 8),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-e-resize shadow-sm"
-                      data-handle="e"
-                      style={{
-                        left: Math.min(592, sticker.x + sticker.width - 8),
-                        top: Math.max(0, Math.min(592, sticker.y + sticker.height / 2 - 8)),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-s-resize shadow-sm"
-                      data-handle="s"
-                      style={{
-                        left: Math.max(0, Math.min(592, sticker.x + sticker.width / 2 - 8)),
-                        top: Math.min(592, sticker.y + sticker.height - 8),
-                      }}
-                    />
-                    <div
-                      className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-w-resize shadow-sm"
-                      data-handle="w"
-                      style={{
-                        left: Math.max(0, sticker.x - 8),
-                        top: Math.max(0, Math.min(592, sticker.y + sticker.height / 2 - 8)),
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-            ))}
+              const displayX = sticker.x * scaleX
+              const displayY = sticker.y * scaleY
+              const displayWidth = sticker.width * scaleX
+              const displayHeight = sticker.height * scaleY
+
+              return (
+                <div key={sticker.id}>
+                  <div
+                    className={`
+                      absolute border-2 cursor-move
+                      ${
+                        selectedSticker === sticker.id
+                          ? "border-primary bg-primary/10"
+                          : "border-transparent hover:border-primary/50"
+                      }
+                    `}
+                    style={{
+                      left: displayX,
+                      top: displayY,
+                      width: displayWidth,
+                      height: displayHeight,
+                      transform: `rotate(${sticker.rotation}deg)`,
+                    }}
+                  />
+
+                  {selectedSticker === sticker.id && (
+                    <>
+                      {/* Corner handles */}
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-nw-resize shadow-lg"
+                        data-handle="nw"
+                        style={{
+                          left: displayX - 8,
+                          top: displayY - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-ne-resize shadow-lg"
+                        data-handle="ne"
+                        style={{
+                          left: displayX + displayWidth - 8,
+                          top: displayY - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-se-resize shadow-lg"
+                        data-handle="se"
+                        style={{
+                          left: displayX + displayWidth - 8,
+                          top: displayY + displayHeight - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-sw-resize shadow-lg"
+                        data-handle="sw"
+                        style={{
+                          left: displayX - 8,
+                          top: displayY + displayHeight - 8,
+                        }}
+                      />
+
+                      {/* Edge handles */}
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-n-resize shadow-lg"
+                        data-handle="n"
+                        style={{
+                          left: displayX + displayWidth / 2 - 8,
+                          top: displayY - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-e-resize shadow-lg"
+                        data-handle="e"
+                        style={{
+                          left: displayX + displayWidth - 8,
+                          top: displayY + displayHeight / 2 - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-s-resize shadow-lg"
+                        data-handle="s"
+                        style={{
+                          left: displayX + displayWidth / 2 - 8,
+                          top: displayY + displayHeight - 8,
+                        }}
+                      />
+                      <div
+                        className="resize-handle absolute w-4 h-4 bg-primary border-2 border-white rounded-full cursor-w-resize shadow-lg"
+                        data-handle="w"
+                        style={{
+                          left: displayX - 8,
+                          top: displayY + displayHeight / 2 - 8,
+                        }}
+                      />
+                    </>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 
